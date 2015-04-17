@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Login NoCaptcha
-Plugin URI: https://wordpress.org/plugins/login-nocaptcha/
-Description: Adds a Google ReCaptcha No Captcha checkbox to the login form, thwarting automated hacking attempts
+Plugin Name: Login No Captcha reCAPTCHA
+Plugin URI: https://wordpress.org/plugins/login-recaptcha/
+Description: Adds a Google reCAPTCHA No Captcha checkbox to the login form, thwarting automated hacking attempts
 Author: Robert Peake
-Version: 1.0.0
+Version: 1.0.1
 Author URI: http://www.robertpeake.com/
 Text Domain: login_nocaptcha
 Domain Path: /languages/
@@ -51,7 +51,7 @@ class LoginNocaptcha {
 
         /* system values to determine if captcha is working and display useful error messages */
         add_option('login_nocaptcha_working', false);
-        add_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha has not been properly configured. <a href="%s">Click here</a> to configure.','login_nocaptcha'), 'options-general.php?page=login-nocaptcha/admin.php'));
+        add_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha has not been properly configured. <a href="%s">Click here</a> to configure.','login_nocaptcha'), 'options-general.php?page=login-recaptcha/admin.php'));
         add_option('login_nocaptcha_message_type', 'update-nag');
         if (LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_key')) && 
            LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_secret')) ) {
@@ -59,7 +59,7 @@ class LoginNocaptcha {
         } else {
             update_option('login_nocaptcha_working', false);
             update_option('login_nocaptcha_message_type', 'update-nag');
-            update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha has not been properly configured. <a href="%s">Click here</a> to configure.','login_nocaptcha'), 'options-general.php?page=login-nocaptcha/admin.php'));
+            update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha has not been properly configured. <a href="%s">Click here</a> to configure.','login_nocaptcha'), 'options-general.php?page=login-recaptcha/admin.php'));
         }
     }
 
@@ -134,7 +134,7 @@ class LoginNocaptcha {
                         update_option('login_nocaptcha_working', false);
                         update_option('login_nocaptcha_google_error', 'error');
                         update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>. The message from Google was: %s', 'login_nocaptcha'), 
-                                                               'options-general.php?page=login-nocaptcha/admin.php',
+                                                               'options-general.php?page=login-recaptcha/admin.php',
                                                                 get_google_errors_as_string($g_response)));
                         return $user; //invalid secret entered; prevent lockouts
                     } else {
@@ -145,13 +145,13 @@ class LoginNocaptcha {
             } else {
                 update_option('login_nocaptcha_working', false);
                 update_option('login_nocaptcha_google_error', 'error');
-                update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>.', 'login_nocaptcha'), 'options-general.php?page=login-nocaptcha/admin.php').' '.__('The response from Google was not valid.','login_nocaptcha'));
+                update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>.', 'login_nocaptcha'), 'options-general.php?page=login-recaptcha/admin.php').' '.__('The response from Google was not valid.','login_nocaptcha'));
                 return $user; //not a sane response, prevent lockouts
             }
         } else {
             update_option('login_nocaptcha_working', false);
             update_option('login_nocaptcha_google_error', 'error');
-            update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>.', 'login_nocaptcha'), 'options-general.php?page=login-nocaptcha/admin.php').' '.__('There was no response from Google.','login_nocaptcha') );
+            update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>.', 'login_nocaptcha'), 'options-general.php?page=login-recaptcha/admin.php').' '.__('There was no response from Google.','login_nocaptcha') );
             return $user; //no response from Google
         }
     }
