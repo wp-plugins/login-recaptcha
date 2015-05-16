@@ -1,5 +1,5 @@
 === Login No Captcha reCAPTCHA ===
-Contributors: robertpeake
+Contributors: robertpeake, robert.peake
 Tags: google,nocaptcha,recaptcha,security,login,bots
 Requires at least: 3.0.0
 Tested up to: 4.2.2
