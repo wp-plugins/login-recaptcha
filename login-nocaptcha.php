@@ -4,7 +4,7 @@ Plugin Name: Login No Captcha reCAPTCHA
 Plugin URI: https://wordpress.org/plugins/login-recaptcha/
 Description: Adds a Google reCAPTCHA No Captcha checkbox to the login form, thwarting automated hacking attempts
 Author: Robert Peake
-Version: 1.1
+Version: 1.1.1
 Author URI: http://www.robertpeake.com/
 Text Domain: login_nocaptcha
 Domain Path: /languages/
@@ -18,7 +18,7 @@ class LoginNocaptcha {
 
     public static function init() {
         add_action( 'plugins_loaded', array('LoginNocaptcha', 'load_textdomain') );
-        add_action( 'plugins_loaded', array('LoginNocaptcha', 'register_scripts_css' ));
+        add_action( 'wp_enqueue_scripts', array('LoginNocaptcha', 'register_scripts_css' ));
         add_action( 'admin_menu', array('LoginNocaptcha', 'register_menu_page' ));
         add_action( 'admin_init', array('LoginNocaptcha', 'register_settings' ));
         add_action( 'admin_notices', array('LoginNocaptcha', 'admin_notices' ));
