@@ -4,7 +4,7 @@ Plugin Name: Login No Captcha reCAPTCHA
 Plugin URI: https://wordpress.org/plugins/login-recaptcha/
 Description: Adds a Google reCAPTCHA No Captcha checkbox to the login form, thwarting automated hacking attempts
 Author: Robert Peake
-Version: 1.1.1
+Version: 1.1.2
 Author URI: http://www.robertpeake.com/
 Text Domain: login_nocaptcha
 Domain Path: /languages/
@@ -18,14 +18,14 @@ class LoginNocaptcha {
 
     public static function init() {
         add_action( 'plugins_loaded', array('LoginNocaptcha', 'load_textdomain') );
-        add_action( 'wp_enqueue_scripts', array('LoginNocaptcha', 'register_scripts_css' ));
         add_action( 'admin_menu', array('LoginNocaptcha', 'register_menu_page' ));
         add_action( 'admin_init', array('LoginNocaptcha', 'register_settings' ));
         add_action( 'admin_notices', array('LoginNocaptcha', 'admin_notices' ));
 
         if (LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_key')) && 
             LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_secret')) ) {
-            add_action('login_enqueue_scripts', array('LoginNocaptcha', 'login_enqueue_scripts_css'));
+            add_action('login_enqueue_scripts', array('LoginNocaptcha', 'enqueue_scripts_css'));
+            add_action('admin_enqueue_scripts', array('LoginNocaptcha', 'enqueue_scripts_css'));
             add_action('login_form',array('LoginNocaptcha', 'login_form'));
             add_action('authenticate', array('LoginNocaptcha', 'authenticate'), 30, 3);
         }
@@ -80,7 +80,10 @@ class LoginNocaptcha {
         wp_register_style('login_nocaptcha_css', plugin_dir_url( __FILE__ ) . 'css/style.css');
     }
 
-    public static function login_enqueue_scripts_css() {
+    public static function enqueue_scripts_css() {
+        if(!wp_script_is('login_nocaptcha_google_api','registered')) {
+            LoginNocaptcha::register_scripts_css();
+        }
         wp_enqueue_script('login_nocaptcha_google_api');
         wp_enqueue_style('login_nocaptcha_css');
     }
