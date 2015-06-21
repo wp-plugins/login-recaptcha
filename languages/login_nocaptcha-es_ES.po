@@ -140,7 +140,7 @@ msgstr "Opciones de Login NoCatpcha"
 #, php-format
 #@ login_nocaptcha
 msgid "Login NoCaptcha has not been properly configured. <a href=\"%s\">Click here</a> to configure."
-msgstr "Login No Captcha no se ha configurado correctamente. <a href=\"s\">Haga clic aquí</a> para configurarlo."
+msgstr "Login No Captcha no se ha configurado correctamente. <a href=\"%s\">Haga clic aquí</a> para configurarlo."
 
 #: login-nocaptcha.php:115
 #@ login_nocaptcha

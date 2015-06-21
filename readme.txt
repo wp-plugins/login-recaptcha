@@ -1,9 +1,9 @@
 === Login No Captcha reCAPTCHA ===
-Contributors: robertpeake
+Contributors: robertpeake, robert.peake
 Tags: google,nocaptcha,recaptcha,security,login,bots
 Requires at least: 3.0.0
-Tested up to: 4.2
-Stable tag: 1.0.3
+Tested up to: 4.2.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,22 @@ This plugin is not affiliated with or endorsed by Google in any way. Google is a
 2. Login screen once configured
 
 == Changelog ==
+
+= 1.1.3 =
+
+ * Improved handling of certain Google responses
+
+= 1.1.2 =
+
+ * Improved just-in-time script registration (only for admin/login)
+
+= 1.1.1 =
+
+ * Remove warning about enqueueing css/js too early
+
+= 1.1 =
+
+ * Major security improvement: now supporting reCaptcha checking with javascript disabled (thanks to mfjtf)
 
 = 1.0.3 =
 

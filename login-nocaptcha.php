@@ -4,7 +4,7 @@ Plugin Name: Login No Captcha reCAPTCHA
 Plugin URI: https://wordpress.org/plugins/login-recaptcha/
 Description: Adds a Google reCAPTCHA No Captcha checkbox to the login form, thwarting automated hacking attempts
 Author: Robert Peake
-Version: 1.0.3
+Version: 1.1.3
 Author URI: http://www.robertpeake.com/
 Text Domain: login_nocaptcha
 Domain Path: /languages/
@@ -18,14 +18,14 @@ class LoginNocaptcha {
 
     public static function init() {
         add_action( 'plugins_loaded', array('LoginNocaptcha', 'load_textdomain') );
-        add_action( 'plugins_loaded', array('LoginNocaptcha', 'register_scripts_css' ));
         add_action( 'admin_menu', array('LoginNocaptcha', 'register_menu_page' ));
         add_action( 'admin_init', array('LoginNocaptcha', 'register_settings' ));
         add_action( 'admin_notices', array('LoginNocaptcha', 'admin_notices' ));
 
         if (LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_key')) && 
             LoginNocaptcha::valid_key_secret(get_option('login_nocaptcha_secret')) ) {
-            add_action('login_enqueue_scripts', array('LoginNocaptcha', 'login_enqueue_scripts_css'));
+            add_action('login_enqueue_scripts', array('LoginNocaptcha', 'enqueue_scripts_css'));
+            add_action('admin_enqueue_scripts', array('LoginNocaptcha', 'enqueue_scripts_css'));
             add_action('login_form',array('LoginNocaptcha', 'login_form'));
             add_action('authenticate', array('LoginNocaptcha', 'authenticate'), 30, 3);
         }
@@ -80,7 +80,10 @@ class LoginNocaptcha {
         wp_register_style('login_nocaptcha_css', plugin_dir_url( __FILE__ ) . 'css/style.css');
     }
 
-    public static function login_enqueue_scripts_css() {
+    public static function enqueue_scripts_css() {
+        if(!wp_script_is('login_nocaptcha_google_api','registered')) {
+            LoginNocaptcha::register_scripts_css();
+        }
         wp_enqueue_script('login_nocaptcha_google_api');
         wp_enqueue_style('login_nocaptcha_css');
     }
@@ -99,7 +102,27 @@ class LoginNocaptcha {
     }
 
     public static function login_form() {
-        echo sprintf('<div class="g-recaptcha" data-sitekey="%s"></div>', get_option('login_nocaptcha_key'));
+        echo sprintf('<div class="g-recaptcha" data-sitekey="%s"></div>', get_option('login_nocaptcha_key'))."\n";
+        echo '<noscript>'."\n";
+        echo '  <div style="width: 302px; height: 352px;">'."\n";
+        echo '      <div style="width: 302px; height: 352px; position: relative;">'."\n";
+        echo '          <div style="width: 302px; height: 352px; position: absolute;">'."\n";
+        echo sprintf('              <iframe src="https://www.google.com/recaptcha/api/fallback?k=%s"', get_option('login_nocaptcha_key'))."\n";
+        echo '                  frameborder="0" scrolling="no"'."\n";
+        echo '                  style="width: 302px; height:352px; border-style: none;">'."\n";
+        echo '              </iframe>'."\n";
+        echo '          </div>'."\n";
+        echo '          <div style="width: 250px; height: 80px; position: absolute; border-style: none;'."\n";
+        echo '              bottom: 21px; left: 25px; margin: 0px; padding: 0px; right: 25px;">'."\n";
+        echo '              <textarea id="g-recaptcha-response" name="g-recaptcha-response"'."\n";
+        echo '                  class="g-recaptcha-response"'."\n";
+        echo '                  style="width: 250px; height: 80px; border: 1px solid #c1c1c1;'."\n";
+        echo '                  margin: 0px; padding: 0px; resize: none;" value="">'."\n";
+        echo '              </textarea>'."\n";
+        echo '          </div>'."\n";
+        echo '      </div>'."\n";
+        echo '</div>'."\n";
+        echo '</noscript>'."\n";
     }
 
     public static function authenticate($user, $username, $password) {
@@ -126,18 +149,18 @@ class LoginNocaptcha {
                     update_option('login_nocaptcha_working', true);
                     return $user; // success, let them in
                 } else {
-                    if ($g_response->{'error-codes'} && in_array('missing-input-response', $g_response->{'error-codes'})) {
+                    if ( isset($g_response->{'error-codes'}) && $g_response->{'error-codes'} && in_array('missing-input-response', $g_response->{'error-codes'})) {
                         update_option('login_nocaptcha_working', true);
                         return new WP_Error('denied', __('Please check the ReCaptcha box.','login_nocaptcha'));
-                    } else if ($g_response->{'error-codes'} && in_array('missing-input-secret', $g_response->{'error-codes'}) ||
-                           in_array('invalid-input-secret', $g_response->{'error-codes'}) ) {
+                    } else if ( isset($g_response->{'error-codes'}) && $g_response->{'error-codes'} && 
+                                (in_array('missing-input-secret', $g_response->{'error-codes'}) || in_array('invalid-input-secret', $g_response->{'error-codes'})) ) {
                         update_option('login_nocaptcha_working', false);
                         update_option('login_nocaptcha_google_error', 'error');
                         update_option('login_nocaptcha_error', sprintf(__('Login NoCaptcha is not working. <a href="%s">Please check your settings</a>. The message from Google was: %s', 'login_nocaptcha'), 
                                                                'options-general.php?page=login-recaptcha/admin.php',
                                                                 get_google_errors_as_string($g_response)));
                         return $user; //invalid secret entered; prevent lockouts
-                    } else if($g_response->{'error-codes'}) {
+                    } else if( isset($g_response->{'error-codes'})) {
                         update_option('login_nocaptcha_working', true);
                         return new WP_Error('denied', __('Incorrect ReCaptcha, please try again.','login_nocaptcha'));
                     } else {
